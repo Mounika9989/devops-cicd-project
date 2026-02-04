@@ -1,0 +1,27 @@
+- hosts: docker
+  become: yes
+
+  tasks:
+
+    - name: Copy project files to Docker server
+      copy:
+        src: /home/ubuntu/devops-cicd-project/
+        dest: /home/ubuntu/app/
+
+    - name: Stop old container if running
+      command: docker stop myapp
+      ignore_errors: yes
+
+    - name: Remove old container if exists
+      command: docker rm myapp
+      ignore_errors: yes
+
+    - name: Remove old image if exists
+      command: docker rmi myimage
+      ignore_errors: yes
+
+    - name: Build new Docker image
+      command: docker build -t myimage /home/ubuntu/app/
+
+    - name: Run new container
+      command: docker run -d --name myapp -p 80:80 myimage
